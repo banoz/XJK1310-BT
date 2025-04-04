@@ -137,15 +137,16 @@ void loop()
     }
     else
     {
-      // this code will change SPIS pin setup so it is expected for the MCU to go into a reset after the wake up
-      (void)nrf_gpio_pin_read(PCL);
-      if (nrf_gpio_pin_read(PCL))
+      digitalWrite(LED_CONN, LOW);
+      uint32_t ulPin = g_ADigitalPinMap[PCL];
+      (void)nrf_gpio_pin_read(ulPin);
+      if (nrf_gpio_pin_read(ulPin))
       {
-        nrf_gpio_cfg_sense_set(PCL, NRF_GPIO_PIN_SENSE_LOW);
+        nrf_gpio_cfg_sense_set(ulPin, NRF_GPIO_PIN_SENSE_LOW);
       }
       else
       {
-        nrf_gpio_cfg_sense_set(PCL, NRF_GPIO_PIN_SENSE_HIGH);
+        nrf_gpio_cfg_sense_set(ulPin, NRF_GPIO_PIN_SENSE_HIGH);
       }
       if (sd_power_system_off() == NRF_SUCCESS)
       {
