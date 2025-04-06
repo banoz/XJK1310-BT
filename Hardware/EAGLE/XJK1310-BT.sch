@@ -16948,34 +16948,7 @@ Details see: &lt;a href="https://katalog.we-online.com/en/em/WS_TASV_SMT_TACT_SW
 <label x="30.48" y="165.1" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="PDA" class="0">
-<segment>
-<pinref part="J4" gate="G$1" pin="6"/>
-<wire x1="15.24" y1="106.68" x2="25.4" y2="106.68" width="0.1524" layer="91"/>
-<label x="17.78" y="106.68" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="J2" gate="G$1" pin="2"/>
-<wire x1="58.42" y1="170.18" x2="50.8" y2="170.18" width="0.1524" layer="91"/>
-<label x="50.8" y="170.18" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="J3" gate="G$1" pin="2"/>
-<wire x1="58.42" y1="132.08" x2="50.8" y2="132.08" width="0.1524" layer="91"/>
-<label x="50.8" y="132.08" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U1" gate="G$1" pin="P0.13"/>
-<wire x1="177.8" y1="139.7" x2="187.96" y2="139.7" width="0.1524" layer="91"/>
-<label x="182.88" y="139.7" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="IC1" gate="A" pin="I0"/>
-<wire x1="208.28" y1="48.26" x2="200.66" y2="48.26" width="0.1524" layer="91"/>
-<label x="200.66" y="48.26" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="PCL" class="0">
+<net name="SCLK" class="0">
 <segment>
 <pinref part="J4" gate="G$1" pin="7"/>
 <wire x1="15.24" y1="109.22" x2="25.4" y2="109.22" width="0.1524" layer="91"/>
@@ -17189,6 +17162,33 @@ Details see: &lt;a href="https://katalog.we-online.com/en/em/WS_TASV_SMT_TACT_SW
 <pinref part="R6" gate="G$1" pin="1"/>
 <pinref part="LED1" gate="G$1" pin="C"/>
 <wire x1="111.76" y1="124.46" x2="114.3" y2="124.46" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="DIN" class="0">
+<segment>
+<pinref part="J2" gate="G$1" pin="2"/>
+<wire x1="58.42" y1="170.18" x2="50.8" y2="170.18" width="0.1524" layer="91"/>
+<label x="50.8" y="170.18" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="J4" gate="G$1" pin="6"/>
+<wire x1="15.24" y1="106.68" x2="25.4" y2="106.68" width="0.1524" layer="91"/>
+<label x="17.78" y="106.68" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="J3" gate="G$1" pin="2"/>
+<wire x1="58.42" y1="132.08" x2="50.8" y2="132.08" width="0.1524" layer="91"/>
+<label x="50.8" y="132.08" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="P0.13"/>
+<wire x1="177.8" y1="139.7" x2="187.96" y2="139.7" width="0.1524" layer="91"/>
+<label x="182.88" y="139.7" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="A" pin="I0"/>
+<wire x1="208.28" y1="48.26" x2="200.66" y2="48.26" width="0.1524" layer="91"/>
+<label x="200.66" y="48.26" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
