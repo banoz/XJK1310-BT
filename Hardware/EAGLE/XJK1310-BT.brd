@@ -3,7 +3,7 @@
 <eagle version="9.6.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="no" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -3233,7 +3233,7 @@ design rules under a new name.</description>
 <contactref element="S1" pad="4"/>
 <contactref element="S1" pad="3"/>
 <contactref element="S1" pad="5"/>
-<wire x1="51.562" y1="8.255" x2="52.2" y2="8.3" width="0" layer="19" extent="1-1"/>
+<wire x1="52.2" y1="8.3" x2="51.562" y2="8.255" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="VBUS">
 <contactref element="J4" pad="5"/>
@@ -3629,8 +3629,8 @@ design rules under a new name.</description>
 <wire x1="72.85" y1="10.65" x2="72.85" y2="11.001" width="0.1524" layer="1"/>
 <wire x1="73.533" y1="11.684" x2="73.533" y2="12.7" width="0.1524" layer="1"/>
 <wire x1="73.533" y1="12.7" x2="74.88" y2="14.047" width="0.1524" layer="1"/>
+<wire x1="22.2" y1="7.2" x2="19.9" y2="7.2" width="0.254" layer="1"/>
 <wire x1="22.2" y1="7.2" x2="52.2" y2="6.8" width="0" layer="19" extent="1-1"/>
-<wire x1="19.9" y1="7.2" x2="22.2" y2="7.2" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
