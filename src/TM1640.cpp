@@ -1,8 +1,11 @@
 #include <Arduino.h>
-#include "TM1640.h"
+
 #include <nrf_bitmask.h>
 #include <nrf_gpio.h>
 #include <nrf_gpiote.h>
+
+#include "main.h"
+#include "TM1640.h"
 
 // #define PINMAP(x) g_ADigitalPinMap[x]
 // #define PINMAP(x) x
@@ -16,16 +19,13 @@ volatile bool dioState = false;
 
 volatile uint16_t TM1640state = 0xFFFFU; // {counter}{data}
 
-char *TM1640Buffer;
+char TM1640Buffer[BUFFER_LENGTH] = {0};
 volatile uint16_t TM1640BufferIndex = 0;
-volatile uint32_t _lastDataUpdate = 0UL;
 
 void IRQHandler(void);
 
-void setupTM1640(uint32_t dio, uint32_t sclk, uint32_t both, char *buffer)
+void setupTM1640(uint32_t dio, uint32_t sclk, uint32_t both)
 {
-    TM1640Buffer = buffer;
-
     attachInterrupt(dio, IRQHandler, CHANGE);
     attachInterrupt(sclk, IRQHandler, RISING);
     attachInterrupt(both, IRQHandler, FALLING);
@@ -69,6 +69,24 @@ void setupTM1640(uint32_t dio, uint32_t sclk, uint32_t both, char *buffer)
     NVIC_SetPriority(GPIOTE_IRQn, 6);
     NVIC_EnableIRQ(GPIOTE_IRQn);
     */
+}
+
+bool readTM1640(void)
+{
+    if (buffered)
+    {
+        parsePayload(TM1640Buffer);
+
+        for (uint8_t i = 0; i < BUFFER_LENGTH; i++)
+        {
+            TM1640Buffer[i] = 0;
+        }
+
+        buffered = false;
+        return true;
+    }
+
+    return false;
 }
 
 void pushBuffer(uint8_t data)
@@ -163,16 +181,6 @@ inline void processEvent(uint8_t event)
     }
 }
 
-bool isBufferedTM1640(void)
-{
-    return buffered;
-}
-
-void resetBufferTM1640(void)
-{
-    buffered = false;
-}
-
 // extern "C" void GPIOTE_IRQHandler()
 void IRQHandler(void)
 {
@@ -201,57 +209,6 @@ void IRQHandler(void)
         processEvent(event);
     }
 }
-
-uint8_t mapSegment(uint8_t);
-
-volatile int16_t _currentWeight = 0;
-
-void parseData(void)
-{
-    if (isBufferedTM1640())
-    {
-        int16_t parsedWeight = INT16_MAX;
-
-        if (TM1640Buffer[0] == 0x00)
-        {
-            bool g = (TM1640Buffer[10] & 0x40) != 0;
-            bool Oz = (TM1640Buffer[11] & 0x01) != 0;
-            bool M1 = (TM1640Buffer[11] & 0x02) != 0;
-            bool M2 = (TM1640Buffer[11] & 0x08) != 0;
-
-            if (g)
-            {
-                parsedWeight = mapSegment(TM1640Buffer[6]) * 1000 + mapSegment(TM1640Buffer[7]) * 100 + mapSegment(TM1640Buffer[8]) * 10 + mapSegment(TM1640Buffer[9]);
-
-                if (TM1640Buffer[6] & 0x40)
-                {
-                    parsedWeight = -parsedWeight;
-                }
-
-                if (parsedWeight < -2000 || parsedWeight > 2000)
-                {
-                    parsedWeight = INT16_MAX;
-                }
-            }
-
-            /* for (int i = 0; i < BUFFER_LENGTH; i++)
-            {
-                Serial.printf("%02X ", TM1640Buffer[i]);
-            }
-            Serial.print("\n\r\n\r"); */
-        }
-
-        resetBufferTM1640();
-
-        _currentWeight = parsedWeight;
-
-        _lastDataUpdate = millis();
-    }
-}
-
-int16_t currentWeight(void) { return _currentWeight; }
-
-uint32_t lastDataUpdate(void) { return _lastDataUpdate; }
 
 uint8_t mapSegment(uint8_t segmentValue)
 {

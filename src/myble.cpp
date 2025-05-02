@@ -1,9 +1,7 @@
-#include "myble.h"
+#include <bluefruit.h>
 
-#define SCALES_NAME "Tencent Scales"
-#define UUID16_SVC_SCALES 0xFFF0
-#define UUID16_CHR_SCALES_READ 0x36F5
-#define UUID16_CHR_SCALES_WRITE 0xFFF4
+#include "main.h"
+#include "myble.h"
 
 BLEDis bledis; // DIS (Device Information Service) helper class instance
 BLEBas blebas; // BAS (Battery Service) helper class instance
@@ -200,9 +198,14 @@ bool setup_ble(void)
     return true;
 }
 
-void setBattery(uint32_t battery)
-{    
-    blebas.write((battery - 666) / 2.34);
+void setBattery(uint8_t battery)
+{
+    blebas.write(battery);
+}
+
+void disconnect(void)
+{
+    Bluefruit.disconnect(Bluefruit.connHandle());
 }
 
 unsigned long clockMillisOffset = 0;

@@ -1,27 +1,12 @@
 #include <Arduino.h>
+
+#include "main.h"
 #include "myble.h"
 #include "TM1640.h"
 
-#ifndef PDA
-#define PDA 13 // 25  // P0.13
-#endif
-#ifndef DNC
-#define DNC 15 // 24  // P0.15
-#endif
-#ifndef PCL
-#define PCL 17 // 29  // P0.17
-#endif
-#ifndef BUT_P
-#define BUT_P 3 // 19  // P0.03
-#endif
-#ifndef BUT_T
-#define BUT_T 28 // 17  // P0.28
-#endif
-#ifndef VDIV
-#define VDIV 29 // 18  // P0.29
-#endif
-
-char bufferTM1640[BUFFER_LENGTH] = {0};
+volatile bool weightChanged, timeChanged;
+volatile int16_t previousWeight = 0, currentWeight = 0;
+volatile int16_t previousTime = 0, currentTime = 0;
 
 void setT(bool push)
 {
@@ -65,18 +50,23 @@ void setup()
 
   Serial.begin(921600, SERIAL_8N1);
 
-  setupTM1640(PDA, PCL, DNC, bufferTM1640);
+  setupTM1640(PDA, PCL, DNC);
 
   setup_ble();
 }
 
-uint32_t weightUpdateMillis = 5000UL;
-uint32_t inTareUpdateMillis = 0UL;
-uint32_t batteryUpdateMillis = 0UL;
+volatile uint32_t weightUpdateMillis = 1000UL;
+volatile uint32_t inTareUpdateMillis = 0UL;
+volatile uint32_t batteryUpdateMillis = 0UL;
+
+volatile uint32_t lastDataUpdate = 0UL;
 
 void loop()
 {
-  parseData();
+  if (readTM1640())
+  {
+    lastDataUpdate = millis();
+  }
 
   if (isInTare())
   {
@@ -89,7 +79,7 @@ void loop()
     {
       setP(false);
       notifyTareDone();
-      
+
       inTareUpdateMillis = millis() + 1000UL;
     }
   }
@@ -102,7 +92,7 @@ void loop()
   {
     if (weightUpdateMillis < millis())
     {
-      int16_t weight = currentWeight();
+      int16_t weight = currentWeight;
 
       if (weight < INT16_MAX)
       {
@@ -123,17 +113,17 @@ void loop()
     {
       uint32_t battery = analogRead(PIN_VBAT);
 
-      setBattery(battery);
+      setBattery((battery - 666) / 2.34);
 
       batteryUpdateMillis = millis() + 1000UL;
     }
   }
 
-  if (millis() > (lastDataUpdate() + 3000))
+  if (millis() > (lastDataUpdate + 3000))
   {
     if (isConnected())
     {
-      Bluefruit.disconnect(Bluefruit.connHandle());
+      disconnect();
     }
     else
     {
@@ -155,4 +145,42 @@ void loop()
       }
     }
   }
+}
+
+void parsePayload(const char *payload)
+{
+  int16_t parsedWeight = INT16_MAX;
+
+  if (payload[0] == 0x00)
+  {
+    bool g = (payload[10] & 0x40) != 0;
+    bool Oz = (payload[11] & 0x01) != 0;
+    bool M1 = (payload[11] & 0x02) != 0;
+    bool M2 = (payload[11] & 0x08) != 0;
+
+    if (g)
+    {
+      parsedWeight = mapSegment(payload[6]) * 1000 + mapSegment(payload[7]) * 100 + mapSegment(payload[8]) * 10 + mapSegment(payload[9]);
+
+      if (payload[6] & 0x40)
+      {
+        parsedWeight = -parsedWeight;
+      }
+
+      if (parsedWeight < -2000 || parsedWeight > 2000)
+      {
+        parsedWeight = INT16_MAX;
+      }
+    }
+
+#ifdef SERIAL_DEBUG_ENABLED
+    for (int i = 0; i < BUFFER_LENGTH; i++)
+    {
+      Serial.printf("%02X ", payload[i]);
+    }
+    Serial.print("\n\r\n\r");
+#endif
+  }
+
+  currentWeight = parsedWeight;
 }
